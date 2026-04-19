@@ -1,0 +1,195 @@
+<div class="page-container">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h2>Meus Anúncios</h2>
+      <p class="subtitle" *ngIf="pagination()">
+        {{ pagination().total }} anúncios encontrados
+      </p>
+    </div>
+    <div class="header-actions">
+      <button class="btn-secondary" (click)="sync()" [disabled]="syncing()">
+        {{ syncing() ? 'Sincronizando...' : 'Sincronizar ML' }}
+      </button>
+      <a routerLink="/listings/new" class="btn-primary">+ Novo Anúncio</a>
+    </div>
+  </div>
+
+  <!-- Alertas -->
+  <div class="alert alert-success" *ngIf="successMsg()">{{ successMsg() }}</div>
+  <div class="alert alert-error"   *ngIf="error()">{{ error() }}</div>
+
+  <!-- Filtros -->
+  <div class="meli-card filters-card">
+    <input
+      class="search-input"
+      type="text"
+      placeholder="Buscar por título..."
+      [(ngModel)]="filters.search"
+      (input)="onSearch()"
+    />
+    <select [(ngModel)]="filters.status" (change)="onFilterChange()">
+      <option value="">Todos os status</option>
+      <option value="active">Ativo</option>
+      <option value="paused">Pausado</option>
+      <option value="closed">Encerrado</option>
+    </select>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading-spinner" *ngIf="loading()">
+    <span>Carregando anúncios...</span>
+  </div>
+
+  <!-- Empty state -->
+  <div class="meli-card empty-state" *ngIf="!loading() && listings().length === 0">
+    <h3>Nenhum anúncio encontrado</h3>
+    <p>Sincronize seus anúncios do Mercado Livre ou crie um novo.</p>
+    <div style="display:flex;gap:12px;justify-content:center">
+      <button class="btn-secondary" (click)="sync()">Sincronizar ML</button>
+      <a routerLink="/listings/new" class="btn-primary">+ Novo Anúncio</a>
+    </div>
+  </div>
+
+  <!-- Tabela -->
+  <div class="meli-card table-card" *ngIf="!loading() && listings().length > 0">
+    <table class="listings-table">
+      <thead>
+        <tr>
+          <th>Produto</th>
+          <th>Preço (R$)</th>
+          <th>Estoque</th>
+          <th>Status</th>
+          <th>Sincronizado</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let listing of listings()">
+          <td class="product-cell">
+            <img [src]="listing.thumbnail" [alt]="listing.title"
+                 class="product-thumb" *ngIf="listing.thumbnail" />
+            <span class="product-title">{{ listing.title }}</span>
+          </td>
+          <td>
+            <input
+              class="inline-input"
+              type="number"
+              [value]="listing.price"
+              min="0"
+              step="0.01"
+              (change)="quickUpdate(listing, 'price', $event)"
+            />
+          </td>
+          <td>
+            <input
+              class="inline-input inline-input--sm"
+              type="number"
+              [value]="listing.quantity"
+              min="0"
+              (change)="quickUpdate(listing, 'quantity', $event)"
+            />
+          </td>
+          <td>
+            <span class="status-badge" [class]="listing.status">
+              {{ listing.status === 'active' ? 'Ativo' :
+                 listing.status === 'paused' ? 'Pausado' : 'Encerrado' }}
+            </span>
+          </td>
+          <td class="sync-date">
+            {{ listing.lastSyncedAt | date:'dd/MM HH:mm' }}
+          </td>
+          <td class="actions-cell">
+            <button
+              class="btn-toggle"
+              [class.paused]="listing.status === 'active'"
+              (click)="toggleStatus(listing)"
+              *ngIf="listing.status !== 'closed'"
+            >
+              {{ listing.status === 'active' ? 'Pausar' : 'Ativar' }}
+            </button>
+            <a [routerLink]="['/listings', listing._id, 'edit']"
+               class="btn-edit">Editar</a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Paginação -->
+    <div class="pagination" *ngIf="pagination() && pagination().totalPages > 1">
+      <button
+        *ngFor="let p of pages"
+        [class.active]="p === filters.page"
+        (click)="changePage(p)"
+      >{{ p }}</button>
+    </div>
+  </div>
+</div>
+
+<style>
+.page-header {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  margin-bottom: 20px;
+  h2 { font-size: 22px; font-weight: 700; color: #1a1a2e; }
+  .subtitle { font-size: 13px; color: #888; margin-top: 4px; }
+}
+.header-actions { display: flex; gap: 12px; align-items: center; }
+.filters-card {
+  display: flex; gap: 12px; margin-bottom: 16px; padding: 16px;
+  .search-input {
+    flex: 1; padding: 10px 12px; border: 1px solid #ddd;
+    border-radius: 6px; font-size: 14px;
+    &:focus { outline: none; border-color: #3483FA; }
+  }
+  select {
+    padding: 10px 12px; border: 1px solid #ddd;
+    border-radius: 6px; font-size: 14px; min-width: 160px;
+    &:focus { outline: none; border-color: #3483FA; }
+  }
+}
+.table-card { padding: 0; overflow: hidden; }
+.listings-table {
+  width: 100%; border-collapse: collapse;
+  th {
+    background: #f8f8f8; padding: 12px 16px;
+    text-align: left; font-size: 12px;
+    font-weight: 600; color: #666; text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  td { padding: 12px 16px; border-bottom: 1px solid #f0f0f0; vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #fafafa; }
+}
+.product-cell { display: flex; align-items: center; gap: 10px; min-width: 200px; }
+.product-thumb { width: 40px; height: 40px; object-fit: cover; border-radius: 4px; }
+.product-title { font-size: 13px; color: #333; line-height: 1.4; }
+.inline-input {
+  width: 90px; padding: 6px 8px;
+  border: 1px solid #ddd; border-radius: 4px; font-size: 13px;
+  &:focus { outline: none; border-color: #3483FA; }
+  &--sm { width: 60px; }
+}
+.sync-date { font-size: 12px; color: #999; }
+.actions-cell { display: flex; gap: 8px; align-items: center; }
+.btn-toggle {
+  padding: 5px 12px; border-radius: 4px; border: none;
+  font-size: 12px; cursor: pointer; background: #e8f5e9; color: #2e7d32;
+  &.paused { background: #fff3e0; color: #e65100; }
+}
+.btn-edit {
+  padding: 5px 12px; border-radius: 4px; border: 1px solid #3483FA;
+  font-size: 12px; color: #3483FA; text-decoration: none;
+  &:hover { background: #e8f0fe; }
+}
+.pagination {
+  display: flex; gap: 8px; justify-content: center; padding: 16px;
+  button {
+    width: 36px; height: 36px; border-radius: 6px;
+    border: 1px solid #ddd; background: white;
+    font-size: 14px; cursor: pointer;
+    &.active { background: #3483FA; color: white; border-color: #3483FA; }
+    &:hover:not(.active) { background: #f0f0f0; }
+  }
+}
+</style>

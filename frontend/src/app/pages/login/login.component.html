@@ -1,0 +1,61 @@
+<div class="login-page">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="logo-icon">M</div>
+      <h1>Meli Manager</h1>
+      <p>Gerencie seus anúncios do Mercado Livre</p>
+    </div>
+
+    <div class="alert alert-error" *ngIf="error()">{{ error() }}</div>
+
+    <button class="btn-meli-login" (click)="login()" [disabled]="loading()">
+      <span *ngIf="!loading()">Entrar com Mercado Livre</span>
+      <span *ngIf="loading()">Redirecionando...</span>
+    </button>
+
+    <ul class="features-list">
+      <li>Crie e gerencie anúncios</li>
+      <li>Atualize preços e estoque em massa</li>
+      <li>Sincronização automática com o ML</li>
+    </ul>
+  </div>
+</div>
+
+<style>
+.login-page {
+  min-height: calc(100vh - 56px);
+  display: flex; align-items: center; justify-content: center;
+  background: #EBEBEB; padding: 24px;
+}
+.login-card {
+  background: white; border-radius: 12px;
+  padding: 48px 40px; max-width: 400px; width: 100%;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.1); text-align: center;
+}
+.login-logo { margin-bottom: 32px; }
+.logo-icon {
+  background: #FFE600; color: #333;
+  width: 64px; height: 64px; border-radius: 16px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 32px; font-weight: 700; margin: 0 auto 16px;
+}
+h1 { font-size: 24px; font-weight: 700; margin-bottom: 8px; color: #1a1a2e; }
+p  { font-size: 14px; color: #777; }
+.btn-meli-login {
+  background: #3483FA; color: white; border: none;
+  width: 100%; padding: 14px; border-radius: 8px;
+  font-size: 16px; font-weight: 600; cursor: pointer;
+  transition: background 0.2s; margin-bottom: 24px;
+  &:hover:not(:disabled) { background: #2968c8; }
+  &:disabled { opacity: 0.7; cursor: not-allowed; }
+}
+.features-list {
+  list-style: none; text-align: left; padding: 0;
+  li {
+    padding: 8px 0; font-size: 13px; color: #555;
+    border-bottom: 1px solid #f0f0f0;
+    display: flex; align-items: center; gap: 8px;
+    &::before { content: '✓'; color: #2ecc71; font-weight: 700; }
+  }
+}
+</style>

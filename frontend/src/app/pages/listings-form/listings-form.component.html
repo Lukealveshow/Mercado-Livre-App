@@ -1,0 +1,143 @@
+<div class="page-container">
+  <div class="form-header">
+    <a routerLink="/listings" class="back-link">← Voltar</a>
+    <h2>{{ isEdit() ? 'Editar Anúncio' : 'Novo Anúncio' }}</h2>
+  </div>
+
+  <div class="loading-spinner" *ngIf="loading()">
+    <span>Carregando...</span>
+  </div>
+
+  <div class="meli-card form-card" *ngIf="!loading()">
+    <div class="alert alert-error" *ngIf="error()">{{ error() }}</div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()">
+
+      <div class="form-field">
+        <label>Título do Anúncio *</label>
+        <input formControlName="title"
+               placeholder="Ex: Tênis Nike Air Max 90 Masculino"
+               (blur)="searchCategories()" />
+        <small class="error" *ngIf="hasError('title', 'required')">
+          Título obrigatório
+        </small>
+        <small class="error" *ngIf="hasError('title', 'minlength')">
+          Mínimo de 10 caracteres
+        </small>
+        <small style="color:#888;font-size:12px">
+          Após digitar o título, sugeriremos categorias automaticamente
+        </small>
+      </div>
+
+      <!-- Sugestão de categorias -->
+      <div class="categories-box" *ngIf="categories().length > 0 || catLoading()">
+        <p class="cat-label">Categorias sugeridas:</p>
+        <div class="loading-spinner" *ngIf="catLoading()" style="padding:8px">
+          <span style="font-size:13px">Buscando categorias...</span>
+        </div>
+        <div class="cat-list">
+          <button
+            type="button"
+            class="cat-chip"
+            *ngFor="let cat of categories()"
+            [class.selected]="form.value.categoryId === cat.category_id"
+            (click)="selectCategory(cat)"
+          >{{ cat.domain_name || cat.category_name }}</button>
+        </div>
+      </div>
+
+      <!-- Categoria manual -->
+      <div class="form-field">
+        <label>ID da Categoria *</label>
+        <input formControlName="categoryId"
+               placeholder="Ex: MLB1051 (selecionado automaticamente acima)" />
+        <small class="error" *ngIf="hasError('categoryId', 'required')">
+          Categoria obrigatória
+        </small>
+      </div>
+
+      <div class="form-row">
+        <div class="form-field">
+          <label>Preço (R$) *</label>
+          <input formControlName="price" type="number" min="0.01"
+                 step="0.01" placeholder="0,00" />
+          <small class="error" *ngIf="hasError('price', 'required')">
+            Preço obrigatório
+          </small>
+          <small class="error" *ngIf="hasError('price', 'min')">
+            Preço deve ser maior que zero
+          </small>
+        </div>
+
+        <div class="form-field">
+          <label>Estoque *</label>
+          <input formControlName="quantity" type="number" min="0"
+                 placeholder="0" />
+          <small class="error" *ngIf="hasError('quantity', 'required')">
+            Estoque obrigatório
+          </small>
+        </div>
+      </div>
+
+      <div class="form-row" *ngIf="!isEdit()">
+        <div class="form-field">
+          <label>Condição</label>
+          <select formControlName="condition">
+            <option value="new">Novo</option>
+            <option value="used">Usado</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-field" *ngIf="isEdit()">
+        <label>Status</label>
+        <select formControlName="status">
+          <option value="active">Ativo</option>
+          <option value="paused">Pausado</option>
+        </select>
+      </div>
+
+      <div class="form-field" *ngIf="!isEdit()">
+        <label>Descrição</label>
+        <textarea formControlName="description"
+                  placeholder="Descreva o produto..."></textarea>
+      </div>
+
+      <div class="form-actions">
+        <a routerLink="/listings" class="btn-secondary">Cancelar</a>
+        <button type="submit" class="btn-primary" [disabled]="saving()">
+          {{ saving() ? 'Salvando...' : (isEdit() ? 'Salvar Alterações' : 'Publicar Anúncio') }}
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+<style>
+.form-header {
+  margin-bottom: 20px;
+  .back-link { font-size: 13px; color: #3483FA; text-decoration: none; display: block; margin-bottom: 8px; }
+  h2 { font-size: 22px; font-weight: 700; color: #1a1a2e; }
+}
+.form-card { max-width: 700px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.form-actions {
+  display: flex; justify-content: flex-end; gap: 12px;
+  margin-top: 24px; padding-top: 20px; border-top: 1px solid #f0f0f0;
+}
+.categories-box {
+  background: #f8f9fa; border-radius: 8px;
+  padding: 12px 16px; margin-bottom: 16px;
+}
+.cat-label { font-size: 12px; font-weight: 600; color: #666; margin-bottom: 8px; }
+.cat-list { display: flex; flex-wrap: wrap; gap: 8px; }
+.cat-chip {
+  padding: 5px 12px; border-radius: 16px;
+  border: 1px solid #ddd; background: white;
+  font-size: 12px; cursor: pointer;
+  transition: all 0.15s;
+  &.selected { background: #3483FA; color: white; border-color: #3483FA; }
+  &:hover:not(.selected) { border-color: #3483FA; color: #3483FA; }
+}
+</style>
