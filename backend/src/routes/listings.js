@@ -1,0 +1,11 @@
+const router= require('express').Router();
+const listingsController= require('../controllers/listingsController');
+const authMiddleware= require('../middlewares/auth');
+router.use(authMiddleware);
+router.get('/sync',listingsController.syncListings);
+router.get('/categories',listingsController.suggestCategories);
+router.get('/',listingsController.getListings);
+router.get('/:id',listingsController.getListingDetail);
+router.post('/',listingsController.createListing);
+router.patch('/:id',listingsController.updateListing);
+module.exports = router;
