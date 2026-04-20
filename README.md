@@ -2,8 +2,8 @@
 
 > Aplicação fullstack para publicação e gerenciamento de anúncios no Mercado Livre.
 
-**Frontend (produção):** `https://SEU_FRONTEND.vercel.app`
-**Backend (produção):** `https://SEU_BACKEND.onrender.com`
+**Frontend (produção):** `https://mercado-livre-app.vercel.app/`
+**Backend (produção):** `https://api-mercado-livre-jc8i.onrender.com`
 
 ---
 
