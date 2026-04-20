@@ -66,7 +66,7 @@ meli-manager/
 │   │   │   ├── meliService.js
 │   │   │   └── syncService.js
 │   │   └── app.js
-│   ├── .env.example
+│   ├── .env
 │   ├── package.json
 │   └── server.js
 └── frontend/
@@ -81,7 +81,7 @@ meli-manager/
             │   ├── auth-success/
             │   ├── auth-error/
             │   ├── listings/
-            │   └── listing-form/
+            │   └── listings-form/
             └── shared/
                 └── components/
 ```
