@@ -116,7 +116,7 @@ meli-manager/
 ### 1. Clone o repositório
 
 ```bash
-git clone https://github.com/SEU_USUARIO/meli-manager.git
+git clone https://github.com/Lukealveshow/Mercado-Livre-App.git
 cd meli-manager
 ```
 
@@ -138,7 +138,7 @@ MELI_CLIENT_ID=SEU_APP_ID
 MELI_CLIENT_SECRET=SEU_CLIENT_SECRET
 MELI_REDIRECT_URI=https://SEU_BACKEND.onrender.com/auth/callback
 
-JWT_SECRET=sua_chave_secreta_longa
+JWT_SECRET=SUA_CHAVE_JWT
 ```
 
 > Para gerar o JWT_SECRET rode: `node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"`
@@ -187,7 +187,7 @@ Acesse `http://localhost:4200`.
 
 1. Acesse [developers.mercadolivre.com.br/devcenter](https://developers.mercadolivre.com.br/devcenter)
 2. Crie uma aplicação com:
-   - **URI de redirect:** `https://SEU_BACKEND.onrender.com/auth/callback`
+   - **URI de redirect:** `https://api-mercado-livre-jc8i.onrender.com/auth/callback`
    - **Escopos:** `read`, `write`, `offline_access`
    - **Permissões:** Usuários, Publicação e sincronização
 3. Copie o `App ID` e `Client Secret` para o `.env`
